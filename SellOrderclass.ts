@@ -1,8 +1,8 @@
-class Sell {
-    private company: string;
-    private quantity: number;
-    private minPrice: number;
-    private seller: string;
+class Sell {             //Clase ventas
+    private company: string;    //Nombre de la compañia
+    private quantity: number;   //Cantidad de acciones a comprar
+    private minPrice: number;   //Precio minimo de venta
+    private seller: string;     //Nombre del vendedor
 
     constructor(company: string, quantity: number, minPrice: number, seller: string) {
         this.company = company;
@@ -11,8 +11,8 @@ class Sell {
         this.seller = seller;
     }
 
-    public getMinPrice(): number {
-        return this.minPrice;
+    public getMinPrice(): number {      //Metodos get para obtener el dato que necesitemos
+        return this.minPrice;           //en nuestro heap
     }
 
     public getQuantity(): number {
@@ -26,60 +26,48 @@ class Sell {
     public getSeller(): string {
         return this.seller;
     }
+
+    public reduceQuantity(amount: number): void {   //Con este metodo obtenemos la cantidad de accciones
+        this.quantity -= amount;                    //que se compraran y se quitaran de las puestas inicialmente
+    }
 }
 
-class MinHeap{
-    public heap: Sell[];
+export class MinHeap {
+    public heap: Sell[];    //Arreglo de tipo sell
     private n: number;
 
-    constructor(size: number) {
-        this.heap = new Array(size + 1);
-        this.n = 0;
+    constructor(size: number) {     //Creamos nuestro heap
+        this.heap = new Array(size + 1);    //Iniciamos en la posicion 1
+        this.n = 0; //elementos ingresados
     }
 
-    public insert(order: Sell): void {
-        if (this.n === this.heap.length - 1) this.resize(2 * this.heap.length);
+    public insert(order: Sell): void {  //Metodo para insertar datos
+        if (this.n == this.heap.length - 1) this.resize(2 * this.heap.length);
         this.n++;
         this.heap[this.n] = order;
-        this.swim(this.n);
+        this.swap(this.n);  
     }
 
-    private swim(i: number): void {
-        let parent: number = Math.floor(i / 2);
-        while (i > 1 && this.heap[parent].getMinPrice() > this.heap[i].getMinPrice()) {
-            this.swap(parent, i);
-            i = parent;
-            parent = Math.floor(i / 2);
-        }
-    }
-
-    public getMin(): Sell | null {
+    public getMin(): Sell | null {  //Funcion para obetener la mejor oferta
         if (this.n === 0) return null;
         const min = this.heap[1];
-        this.swap(1, this.n);
+        this.swap(this.n);  
         this.heap[this.n] = null!;
         this.n--;
-        this.sink(1);
+        this.swap(1); 
         return min;
     }
 
-    private sink(i: number): void {
-        while (2 * i <= this.n) {
-            let j: number = 2 * i;
-            if (j < this.n && this.heap[j].getMinPrice() > this.heap[j + 1].getMinPrice()) j++;
-            if (this.heap[i].getMinPrice() <= this.heap[j].getMinPrice()) break;
-            this.swap(i, j);
-            i = j;
+    private swap(i: number): void {     //Aqui comparamos los datos
+        let padre: number = Math.floor(i / 2);
+        while (i > 1 && this.heap[padre].getMinPrice() > this.heap[i].getMinPrice()) {
+            [this.heap[padre], this.heap[i]] = [this.heap[i], this.heap[padre]];
+            i = padre;
+            padre = Math.floor(i / 2);
         }
     }
 
-    private swap(i: number, j: number): void {
-        const temp = this.heap[i];
-        this.heap[i] = this.heap[j];
-        this.heap[j] = temp;
-    }
-
-    private resize(newSize: number): void {
+    private resize(newSize: number): void { //Reorganizacion del array
         const newHeap = new Array(newSize);
         for (let i = 1; i <= this.n; i++) {
             newHeap[i] = this.heap[i];
@@ -87,27 +75,12 @@ class MinHeap{
         this.heap = newHeap;
     }
 
-    public show(): void {
-        console.log("Ordenes de Venta:");
+    public show(): void {   //Mostramos los datos de nuestros vendedores, cantidad, compañia y precio
+        console.log("Ordenes de ventas:");
         for (let i = 1; i <= this.n; i++) {
             const order = this.heap[i];
-            console.log(`Vendedor: ${order.getSeller()}, Compañía: ${order.getCompany()}, Cantidad: ${order.getQuantity()}, Precio mínimo: ${order.getMinPrice()}`);
+            console.log(`Vendedor: ${order.getSeller()}, Empresa: ${order.getCompany()}, Cantidad de acciones: ${order.getQuantity()}, Precio minimo venta: ${order.getMinPrice()}`);
         }
     }
 }
 
-// Ejemplo de uso
-const sell1 = new Sell("Compañía A", 100, 50, "Vendedor1");
-const sell2 = new Sell("Compañía B", 200, 40, "Vendedor2");
-const sell3 = new Sell("Compañía C", 150, 45, "Vendedor3");
-
-const sellHeap = new MinHeap(10);
-
-sellHeap.insert(sell1);
-sellHeap.insert(sell2);
-sellHeap.insert(sell3);
-
-sellHeap.show();
-
-const bestOffer = sellHeap.getMin();
-console.log(`La mejor oferta es de ${bestOffer?.getMinPrice()} de ${bestOffer?.getSeller()} para la compañía ${bestOffer?.getCompany()}`);
