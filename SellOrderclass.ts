@@ -1,4 +1,4 @@
-class Sell {             //Clase ventas
+export class Sell {             //Clase ventas
     private company: string;    //Nombre de la compañia
     private quantity: number;   //Cantidad de acciones a comprar
     private minPrice: number;   //Precio minimo de venta
@@ -33,32 +33,40 @@ class Sell {             //Clase ventas
 }
 
 export class MinHeap {
-    public heap: Sell[];    //Arreglo de tipo sell
+    public heap: Sell[];    // Arreglo de tipo Sell
     private n: number;
 
-    constructor(size: number) {     //Creamos nuestro heap
-        this.heap = new Array(size + 1);    //Iniciamos en la posicion 1
-        this.n = 0; //elementos ingresados
+    constructor(size: number) {     // Creamos nuestro heap
+        this.heap = new Array(size + 1);    // Iniciamos en la posición 1
+        this.n = 0; // Elementos ingresados
     }
 
-    public insert(order: Sell): void {  //Metodo para insertar datos
+    public insert(order: Sell): void {  // Método para insertar datos
         if (this.n == this.heap.length - 1) this.resize(2 * this.heap.length);
         this.n++;
         this.heap[this.n] = order;
-        this.swap(this.n);  
+        this.swim(this.n);  
     }
 
-    public getMin(): Sell | null {  //Funcion para obetener la mejor oferta
+    public getMin(): Sell | null {  // Función para obtener la mejor oferta
         if (this.n === 0) return null;
         const min = this.heap[1];
-        this.swap(this.n);  
-        this.heap[this.n] = null!;
+        this.heap[1] = this.heap[this.n]; // Mueve el último elemento a la raíz
+        this.heap[this.n] = null!; // Elimina el último elemento
         this.n--;
-        this.swap(1); 
+        this.sink(1); // Reestructura el heap
         return min;
     }
 
-    private swap(i: number): void {     //Aqui comparamos los datos
+    public removeMin(): void {  // Método para eliminar la mejor oferta
+        if (this.n === 0) return;
+        this.heap[1] = this.heap[this.n]; // Mueve el último elemento a la raíz
+        this.heap[this.n] = null!; // Elimina el último elemento
+        this.n--;
+        this.sink(1); // Reestructura el heap
+    }
+
+    private swim(i: number): void {     // Aquí comparamos los datos para subir
         let padre: number = Math.floor(i / 2);
         while (i > 1 && this.heap[padre].getMinPrice() > this.heap[i].getMinPrice()) {
             [this.heap[padre], this.heap[i]] = [this.heap[i], this.heap[padre]];
@@ -67,7 +75,19 @@ export class MinHeap {
         }
     }
 
-    private resize(newSize: number): void { //Reorganizacion del array
+    private sink(i: number): void {     // Aquí comparamos los datos para bajar
+        while (2 * i <= this.n) {
+            let j = 2 * i; // El hijo izquierdo
+            if (j < this.n && this.heap[j].getMinPrice() > this.heap[j + 1].getMinPrice()) {
+                j++; // Elige el hijo derecho si es menor
+            }
+            if (this.heap[i].getMinPrice() <= this.heap[j].getMinPrice()) break; // Si el padre es menor o igual, termina
+            [this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]]; // Intercambia el padre con el hijo menor
+            i = j; // Continúa con el siguiente nivel
+        }
+    }
+
+    private resize(newSize: number): void { // Reorganización del array
         const newHeap = new Array(newSize);
         for (let i = 1; i <= this.n; i++) {
             newHeap[i] = this.heap[i];
@@ -75,12 +95,11 @@ export class MinHeap {
         this.heap = newHeap;
     }
 
-    public show(): void {   //Mostramos los datos de nuestros vendedores, cantidad, compañia y precio
-        console.log("Ordenes de ventas:");
+    public show(): void {   // Mostramos los datos de nuestros vendedores, cantidad, compañía y precio
+        console.log("Órdenes de ventas:");
         for (let i = 1; i <= this.n; i++) {
             const order = this.heap[i];
-            console.log(`Vendedor: ${order.getSeller()}, Empresa: ${order.getCompany()}, Cantidad de acciones: ${order.getQuantity()}, Precio minimo venta: ${order.getMinPrice()}`);
+            console.log(`Vendedor: ${order.getSeller()}, Empresa: ${order.getCompany()}, Cantidad de acciones: ${order.getQuantity()}, Precio mínimo venta: ${order.getMinPrice()}`);
         }
     }
 }
-
