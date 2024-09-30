@@ -33,6 +33,7 @@ export class BuyOrder {             //Definimos la clase BuyOrder para nuestras 
 }
 
 
+// Clase MaxHeap
 export class MaxHeap {
     public heap: BuyOrder[]; // Arreglo de tipo BuyOrder que guarda las ordenes de compra
     private n: number; // Cantidad de elementos ingresados
@@ -43,7 +44,7 @@ export class MaxHeap {
     }
 
     public checkMax(): BuyOrder | null {
-        return this.heap[1] || null; // Devuelve el máximo si existe
+        return this.heap[1] || null; // Devuelve el maximo si existe
     }
 
     public getQuantity(): number {
@@ -51,7 +52,7 @@ export class MaxHeap {
     }
 
     public insert(order: BuyOrder): void {
-        if (this.n == (this.heap.length - 1)) // Si el heap está lleno, se redimensiona
+        if (this.n == (this.heap.length - 1)) // Si el heap esta lleno, se redimensiona
             this.resize(2 * this.heap.length);
         this.n++;
         this.heap[this.n] = order; 
@@ -59,7 +60,7 @@ export class MaxHeap {
     }
 
     private swap(i: number): void {
-        let father: number = Math.floor(i / 2); // El padre está en la mitad del índice del hijo
+        let father: number = Math.floor(i / 2); 
         while (i > 1 && this.heap[father].getMaxPrice() < this.heap[i].getMaxPrice()) {
             // Intercambia si el padre es menor que el hijo
             const temp: BuyOrder = this.heap[father];
@@ -78,9 +79,20 @@ export class MaxHeap {
         this.heap = newHeap; 
     
     }
-    
+
     public getMax(): BuyOrder | null {
-        if (this.n == 0) return null; // Si el heap está vacío, devuelve null
+        if (this.n == 0) return null; // Si el heap esta vacio, devuelve null
+
+        const max: BuyOrder = this.heap[1]; // Se guarda la direccion del máximo
+        this.heap[1] = this.heap[this.n]; 
+        this.heap[this.n] = null!; // Se elimina el ultimo elemento
+        this.n--; 
+        this.sink(1); 
+        return max; // nos devuelve el maximo
+    }
+
+    public removeMax(): BuyOrder | null {
+        if (this.n == 0) return null; // Si el heap esta vacio, devuelve null
 
         const max: BuyOrder = this.heap[1]; // Se guarda la direccion del maximo
         this.heap[1] = this.heap[this.n]; 
@@ -107,13 +119,20 @@ export class MaxHeap {
         }
     }
 
-    public show(): void {   //nos muestra las ordenes de compra
+    public getAll(): BuyOrder[] {
+        return this.heap.slice(1, this.n + 1); // Retorna todas las ordenes en el heap
+    }
+    
+
+    public show(): void {   // Muestra las ordenes de compra
         console.log("Demandas:");
         for (let i = 1; i <= this.n; i++) {
             const accion = this.heap[i];
-            console.log(`Comprador: ${accion.getBuyer()}, Empresa: ${accion.getCompany()}, Precio Máximo: ${accion.getMaxPrice()}`);
+            console.log(`Comprador: ${accion.getBuyer()}, Empresa: ${accion.getCompany()}, Oferta: ${accion.getMaxPrice()}, Acciones a comprar: ${accion.getQuantity()}`);
         }
     }
 }
+
+
 
 
