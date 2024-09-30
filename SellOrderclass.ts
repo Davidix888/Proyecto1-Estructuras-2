@@ -15,11 +15,11 @@ export class Sell {             //Definimos la clase Sell para nuestras ventas
         return this.company;
     }
 
-    public getOffert(): number {    //Obtenemos la oferta minima
+    public getOffert(): number {    //Obtenemos la mejor oferta
         return this.minPrice;
     }
 
-    public getQuantity(): number {  //
+    public getQuantity(): number {  
         return this.quantity;
     }
 
@@ -32,8 +32,9 @@ export class Sell {             //Definimos la clase Sell para nuestras ventas
     }
 }
 
+// Clase MinHeap
 export class MinHeap {
-    public heap: Sell[]; // Arreglo de tipo sell que guarda las órdenes de venta
+    public heap: Sell[]; // Arreglo de tipo sell que guarda las ordenes de venta
     private n: number; // Cantidad de elementos ingresados
 
     constructor(size: number) {
@@ -78,7 +79,18 @@ export class MinHeap {
     }
 
     public getMin(): Sell | null {
-        if (this.n == 0) return null; // Si el heap está vacío, devuelve null
+        if (this.n == 0) return null; // Si el heap está vacio, devuelve null
+
+        const min: Sell = this.heap[1]; // Se guarda la direccion del minimo
+        this.heap[1] = this.heap[this.n]; 
+        this.heap[this.n] = null!; // Se elimina el ultimo elemento
+        this.n--; 
+        this.sink(1); 
+        return min; // nos devuelve el minimo
+    }
+
+    public removeMin(): Sell | null {
+        if (this.n == 0) return null; // Si el heap está vacio, devuelve null
 
         const min: Sell = this.heap[1]; // Se guarda la direccion del minimo
         this.heap[1] = this.heap[this.n]; 
@@ -105,12 +117,21 @@ export class MinHeap {
         }
     }
 
-    public show(): void {   //nose muestra las ordenes de venta
+    public getAll(): Sell[] {
+        return this.heap.slice(1, this.n + 1); // Retorna todas las ordenes en el heap
+    }
+    
+    public show(): void {   // Muestra las ordenes de venta
         console.log("Ofertas:");
         for (let i = 1; i <= this.n; i++) {
             const accion = this.heap[i];
-            console.log(`Vendedor: ${accion.getSeller()}, Empresa: ${accion.getCompany()}, Precio Mínimo: ${accion.getOffert()}`);
+            console.log(`Vendedor: ${accion.getSeller()}, Empresa: ${accion.getCompany()}, Minimo de compra: ${accion.getOffert()}, Acciones en venta: ${accion.getQuantity()}`);
         }
     }
 }
+
+
+
+
+
 
